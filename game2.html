@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feelings Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #4A90E2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game-container {
+      text-align: center;
+      color: #4A4A4A;
+      width: 80%;
+      max-width: 600px;
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #F5A623;
+    }
+
+    .emotion-image {
+      font-size: 100px; /* Emoji size */
+      margin: 20px 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .emotion-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #F76D2B;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .emotion-button:hover {
+      background-color: #F5A623;
+    }
+
+    .score-container {
+      font-size: 20px;
+    }
+
+    .game-over-container {
+      display: none;
+    }
+
+    #final-score {
+      font-size: 24px;
+      color: #F76D2B;
+    }
+
+    .feedback {
+      font-size: 18px;
+      color: #7ED321;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Feelings Game</h1>
+    <div id="emotion-image" class="emotion-image"></div>
+    <div id="buttons-container" class="buttons-container">
+      <button class="emotion-button" onclick="checkAnswer('Happy')">Happy</button>
+      <button class="emotion-button" onclick="checkAnswer('Sad')">Sad</button>
+      <button class="emotion-button" onclick="checkAnswer('Angry')">Angry</button>
+      <button class="emotion-button" onclick="checkAnswer('Surprised')">Surprised</button>
+    </div>
+    <p id="feedback" class="feedback"></p>
+    <div id="score-container" class="score-container">
+      <p>Score: <span id="score">0</span></p>
+    </div>
+    <div id="game-over-container" class="game-over-container">
+      <p id="final-score"></p>
+      <button onclick="restartGame()">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Add audio elements for sound effects -->
+  <audio id="happy-sound" src="happy-sound.mp3" preload="auto"></audio>
+  <audio id="sad-sound" src="sad-sound.mp3" preload="auto"></audio>
+  <audio id="angry-sound" src="angry-sound.mp3" preload="auto"></audio>
+  <audio id="surprised-sound" src="surprised-sound.mp3" preload="auto"></audio>
+
+  <script>
+    // Emotion mapping with sound files
+    const emotions = {
+      "Happy": "😊",
+      "Sad": "😢",
+      "Angry": "😡",
+      "Surprised": "😲"
+    };
+
+    const feedbackMessages = {
+      "correct": ["Excellent!", "Good job!", "Well done!", "That's right!"],
+      "incorrect": ["Try again!", "Not quite, try again!", "Oops! Give it another try!", "Not quite, but you're close!"]
+    };
+
+    const questions = [
+      { answer: "Sad" },
+      { answer: "Happy" },
+      { answer: "Angry" },
+      { answer: "Surprised" }
+    ];
+
+    let score = 0;
+    let currentQuestion = 0;
+
+    // Preload sound effects
+    const happySound = document.getElementById("happy-sound");
+    const sadSound = document.getElementById("sad-sound");
+    const angrySound = document.getElementById("angry-sound");
+    const surprisedSound = document.getElementById("surprised-sound");
+
+    function startGame() {
+      score = 0;
+      currentQuestion = 0;
+      document.getElementById("score").textContent = score;
+      document.getElementById("game-over-container").style.display = "none";
+      document.getElementById("feedback").textContent = "";
+      showEmotion();
+    }
+
+    function showEmotion() {
+      if (currentQuestion < questions.length) {
+        const questionData = questions[currentQuestion];
+        const correctEmotion = questionData.answer;
+        document.getElementById("emotion-image").textContent = emotions[correctEmotion];
+
+        // Play the corresponding sound for the emotion
+        if (correctEmotion === "Happy") {
+          happySound.play();
+        } else if (correctEmotion === "Sad") {
+          sadSound.play();
+        } else if (correctEmotion === "Angry") {
+          angrySound.play();
+        } else if (correctEmotion === "Surprised") {
+          surprisedSound.play();
+        }
+      } else {
+        showGameOver();
+      }
+    }
+
+    function checkAnswer(selectedEmotion) {
+      const correctAnswer = questions[currentQuestion].answer;
+      const feedbackElement = document.getElementById("feedback");
+
+      if (selectedEmotion === correctAnswer) {
+        score++;
+        document.getElementById("score").textContent = score;
+        feedbackElement.textContent = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
+      } else {
+        feedbackElement.textContent = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
+      }
+
+      currentQuestion++;
+      setTimeout(showEmotion, 1000); // Move to the next emotion after 1 second
+    }
+
+    function showGameOver() {
+      document.getElementById("game-over-container").style.display = "block";
+      document.getElementById("final-score").textContent = `Game Over! Your score: ${score}`;
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
